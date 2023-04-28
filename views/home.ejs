@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/chat_box.css">
+<script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
+<div id="home-container">
+    <%# For Posts%>
+<section id="feed-posts">
+    <%if(locals.user){%>    <%# This will show form only to Logged In User%>
+    <h4>Posts</h4>
+    <form action="/posts/create" method="post"id="new-post-form" method="post">
+        <textarea name="content" cols="30" rows="3" placeholder="Type here..."></textarea>
+        <input type="submit" value="Post">
+    </form>
+    <%}%>
+    <div id="posts-list-container">
+        <ul>
+        <% for(post of posts) { %>
+            <li>
+            <p>   
+                <% if(locals.user && locals.user.id == post.user.id){%>  
+                <small>
+                    <a href="/posts/destroy/<%= post.id %>">Delete</a>
+                </small> 
+                <%}%>                  
+                <%= post.content %>                       
+                <small><%= post.user.name%></small>
+                <a href="/likes/toggle/?id=<%=post._id%>&type=Post">Like</a>
+                <div class="likes-count"><b><%= post.likes.length %> Likes</b></div>
+                <div class="like-comment-bar">
+                    <div class="like"><b><i class="far fa-thumbs-up"></i></i>&nbsp;&nbsp;Like</b></div>
+                    <div class="comment" id="comment-<%= post._id %>"><i class="far fa-comment-alt"></i>&nbsp;&nbsp;<b>Comment</b></div>
+                </div>
+            </p>
+                <div class="post-comment">
+                    <% if(locals.user){%>
+                    <form action="/comments/create" method="post">
+                        <input type="text" name="content" placeholder="Type here to add comment">
+                        <input type="hidden" name="post" value="<%= post._id%>">
+                        <input type="submit" value="Add Comment"> 
+                    </form>
+                    <%}%>
+                <div class="post-comments-list">
+                    <ul id="post-comments-<%= post._id%>">
+                    <% for (comment of post.comments) {%>
+                        <p>
+                            <%= comment.content %>
+                            <small>
+                                <%= comment.user.name %>
+                            </small>
+                            <span>Commented</span>
+                               
+                <% if(locals.user && locals.user.id == comment.user.id){%>    <%# If logged in user is same as the user who commented then only delete button will show. %>
+                    <small>
+                        <a href="/comments/destroy/<%= comment.id %>">Delete</a>
+                    </small> 
+                    <%}%>  
+                        </p>
+                    <%}%>
+                    </ul>
+                </div>
+            </div>
+            </li>
+        <%}%>
+        </ul>
+    </div>
+</section>
+<section id="user-friends">
+    <h4>Friends</h4>
+    <%for (User of all_users){%>
+        <p>
+            <a href="/users/profile/<%=User.id%>"><%=User.name%></a>
+        </p>
+    <%}%>
+</section>
+<%- include('chat_box') -%>
+</div>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="/js/chat_engine.js"></script>
+<%if(locals.user){%>
+    <script>
+        new ChatEngine('user-chat-box','<%=locals.user.email%>');
+    </script>
+<%}%>

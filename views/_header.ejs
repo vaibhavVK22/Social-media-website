@@ -1,0 +1,20 @@
+<header>
+    Page Header
+
+    <%# If user is logged in then page header should have 'SIGN OUT' link if not logged in then 'SIGN IN/SIGN UP' link %>
+    <ul>
+        <% if(locals.user){ %>
+            <li><%= user.name %></li>
+            <li>
+                <a href="/users/signOut">Sign Out</a>
+            </li>
+        <% }else {%>
+            <li>
+                <a href="/users/signIn">Sign In</a>
+            </li>
+            <li>
+                <a href="/users/signUp">Sign Up</a>
+            </li>
+        <% }%>
+    </ul>
+</header>
